@@ -1,0 +1,11 @@
+WITH lead_logs AS(
+    SELECT
+    num,
+    LEAD(num, 1) OVER(ORDER BY id) AS n_num,
+    LEAD(num, 2) OVER(ORDER BY id) AS nn_num
+    FROM Logs
+)
+SELECT DISTINCT num AS "ConsecutiveNums"
+FROM lead_logs
+WHERE num = n_num
+AND n_num = nn_num
