@@ -1,0 +1,22 @@
+WITH total_count AS (
+    SELECT 
+        user_id, 
+        COUNT(*) as total_count
+    FROM Confirmations
+    GROUP BY user_id
+) 
+,
+confirmation_rate AS (
+    SELECT 
+        c.user_id, 
+        ROUND((COUNT(*)::FLOAT / t.total_count)::NUMERIC, 2) as rate
+    FROM Confirmations c
+    JOIN total_count t ON t.user_id = c.user_id
+    GROUP BY c.user_id, t.total_count, c.action
+    HAVING c.action = 'confirmed'
+)
+SELECT 
+    s.user_id, 
+    COALESCE(c.rate, 0) AS confirmation_rate
+FROM confirmation_rate c
+RIGHT JOIN Signups s ON s.user_id = c.user_id;
